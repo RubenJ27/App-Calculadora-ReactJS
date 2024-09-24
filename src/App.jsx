@@ -1,12 +1,11 @@
-import { Calculadora } from "./components/Calculadora"
+import { Calculator } from "./components/Calculator";
 
 function App() {
-
   return (
     <div>
-      <Calculadora />
+      <Calculator />
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

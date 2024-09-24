@@ -1,27 +1,40 @@
 import React, { useState } from "react";
-import "./calculadora.css";
+import "./calculator.css";
 
-export const Calculadora = () => {
-  const [resultado, setResultado] = useState("");
+export const Calculator = () => {
+  const [result, setResult] = useState("");
 
-  const eliminar = () => {
-    setResultado("");
+  const clearResult = () => {
+    setResult("");
   };
 
-  const clear = () => {
-    setResultado(resultado.slice(0, -1));
+  const deleteLastCharacter = () => {
+    setResult(result.slice(0, -1));
   };
 
   const onChange = (e) => {
-    setResultado(resultado.concat(e.target.name));
+    const value = e.target.name;
+    setResult((prev) => formatNumber(prev.replace(/,/g, "") + value));
   };
 
-  const calcular = () => {
+  const calculate = () => {
     try {
-      setResultado(eval(resultado).toString());
+      let evalResult = result.replace(/,/g, "");
+      evalResult = evalResult.replace(/(\d+)%/g, "($1/100)");
+      evalResult = evalResult.replace(/x/g, "*");
+      setResult(formatNumber(eval(evalResult).toString()));
     } catch (error) {
-      setResultado("Error");
+      setResult("Error");
     }
+  };
+
+  const formatNumber = (num) => {
+    return num.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
+
+  const handleInputChange = (e) => {
+    const value = e.target.value.replace(/,/g, "");
+    setResult(formatNumber(value));
   };
 
   return (
@@ -30,24 +43,16 @@ export const Calculadora = () => {
       <div className="container">
         <div className="main">
           <div>
-            <input
-              type="text"
-              placeholder="0"
-              value={resultado}
-              className="input"
-            />
+            <input type="text" placeholder="0" value={result} className="input" onChange={handleInputChange} />
           </div>
           <div className="row1">
-            <button className="btn color" onClick={eliminar}>
+            <button className="btn color" onClick={clearResult}>
               AC
             </button>
-            <button className="btn color" onClick={clear}>
-               +/-
+            <button className="btn color" onClick={deleteLastCharacter}>
+              +/-
             </button>
-            {/* <button className="btn color" onClick={clear}>
-              C
-            </button> */}
-            <button className="btn color" onClick={onChange}>
+            <button className="btn color" name="%" onClick={onChange}>
               %
             </button>
             <button className="btn color" name="/" onClick={onChange}>
@@ -64,10 +69,9 @@ export const Calculadora = () => {
             <button className="btn" name="9" onClick={onChange}>
               9
             </button>
-            <button className="btn color" name="*" onClick={onChange}>
+            <button className="btn color" name="x" onClick={onChange}>
               x
             </button>
-            
           </div>
           <div className="row3">
             <button className="btn" name="4" onClick={onChange}>
@@ -104,10 +108,9 @@ export const Calculadora = () => {
             <button className="btn" name="." onClick={onChange}>
               .
             </button>
-            <button className="btn color" onClick={calcular}>
+            <button className="btn color" onClick={calculate}>
               =
             </button>
-            
           </div>
         </div>
       </div>
