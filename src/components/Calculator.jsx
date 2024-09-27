@@ -8,33 +8,72 @@ export const Calculator = () => {
     setResult("");
   };
 
-  const deleteLastCharacter = () => {
-    setResult(result.slice(0, -1));
+  // Cambia el signo del número actual
+  const invertNumberSign = () => {
+    setResult((prev) => {
+      // Elimina las comas del valor anterior
+      const newValue = prev.replace(/,/g, "");
+
+      // Si el valor anterior es una cadena vacía, devuelve "0"
+      if (prev === "") {
+        return "";
+      }
+
+      // Cambia el signo del número y lo devuelve formateado con comas
+      return formatNumberWithCommas((parseFloat(newValue) * -1).toString());
+    });
   };
 
-  const onChange = (e) => {
-    const value = e.target.name;
-    setResult((prev) => formatNumber(prev.replace(/,/g, "") + value));
+  const formatNumberWithCommas = (num) => {
+    // Usa una expresión regular para insertar comas en las posiciones adecuadas
+    return num.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   };
 
+  const onChange = (event) => {
+    // Obtiene el valor del botón presionado
+    const value = event.target.name;
+    // Actualiza el estado del resultado
+    setResult((prev) => {
+      // Elimina las comas del valor anterior y agrega el nuevo valor
+      const newValue = prev.replace(/,/g, "") + value;
+
+      // Formatea el nuevo valor con comas y lo devuelve
+      return formatNumberWithCommas(newValue);
+    });
+  };
+
+  // Calcula el resultado de la expresión actual
   const calculate = () => {
+    // Verifica si el valor actual es vacío o 0
+    if (result === "" || result === "0") {
+      return;
+    }
     try {
+      // Elimina las comas del resultado actual
       let evalResult = result.replace(/,/g, "");
-      evalResult = evalResult.replace(/(\d+)%/g, "($1/100)");
+
+      // Convierte porcentajes en su equivalente decimal (e.g., 7.5% se convierte en 0.075)
+      evalResult = evalResult.replace(/(\d+(\.\d+)?)%/g, "($1/100)");
+
+      // Reemplaza 'x' por '*' para la multiplicación
       evalResult = evalResult.replace(/x/g, "*");
-      setResult(formatNumber(eval(evalResult).toString()));
+
+      // Evalúa la expresión y formatea el resultado con comas
+      setResult(formatNumberWithCommas(eval(evalResult).toString()));
     } catch (error) {
+      // Si hay un error, muestra "Error" en el resultado
+      console.error("Error en el cálculo:", error);
       setResult("Error");
     }
   };
 
-  const formatNumber = (num) => {
-    return num.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  };
+  // Maneja el cambio de valor en el campo de entrada
+  const handleInputChange = (event) => {
+    // Elimina las comas del valor ingresado
+    const value = event.target.value.replace(/,/g, "");
 
-  const handleInputChange = (e) => {
-    const value = e.target.value.replace(/,/g, "");
-    setResult(formatNumber(value));
+    // Formatea el valor con comas y actualiza el estado del resultado
+    setResult(formatNumberWithCommas(value));
   };
 
   return (
@@ -49,7 +88,7 @@ export const Calculator = () => {
             <button className="btn color" onClick={clearResult}>
               AC
             </button>
-            <button className="btn color" onClick={deleteLastCharacter}>
+            <button className="btn color" onClick={invertNumberSign}>
               +/-
             </button>
             <button className="btn color" name="%" onClick={onChange}>
